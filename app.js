@@ -6,23 +6,6 @@ const state = { set: [], index: 0, step: 1, step1Tries: 0, step2Tries: 0, scores
 const shuffle = (items) => [...items].sort(() => Math.random() - 0.5);
 const escapeHtml = (value) => value.replace(/[&<>'"]/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 
-async function prepareSceneImage() {
-  try {
-    const response = await fetch('./assets/healthy-scenes.png');
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    const isPng = bytes[0] === 137 && bytes[1] === 80 && bytes[2] === 78 && bytes[3] === 71;
-    let imageBytes = bytes;
-    if (!isPng) {
-      const binary = atob(new TextDecoder().decode(bytes).trim());
-      imageBytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
-    }
-    const imageUrl = URL.createObjectURL(new Blob([imageBytes], { type: 'image/png' }));
-    document.documentElement.style.setProperty('--scene-image', `url("${imageUrl}")`);
-  } catch {
-    document.documentElement.style.setProperty('--scene-image', 'linear-gradient(135deg,#eadffc,#fff1e8)');
-  }
-}
-
 function newSet() {
   let previous = [];
   try { previous = JSON.parse(sessionStorage.getItem('healthyDetectivePrevious') || '[]'); } catch {}
@@ -194,6 +177,5 @@ function renderPractice() {
 }
 
 document.querySelector('.brand').addEventListener('click', (event) => { event.preventDefault(); renderStart(); focusMain(); });
-prepareSceneImage();
 renderStart();
 
