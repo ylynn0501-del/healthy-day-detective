@@ -11,9 +11,12 @@ async function prepareSceneImage() {
     const response = await fetch('./assets/healthy-scenes.png');
     const bytes = new Uint8Array(await response.arrayBuffer());
     const isPng = bytes[0] === 137 && bytes[1] === 80 && bytes[2] === 78 && bytes[3] === 71;
-    const imageUrl = isPng
-      ? URL.createObjectURL(new Blob([bytes], { type: 'image/png' }))
-      : `data:image/png;base64,${new TextDecoder().decode(bytes).trim()}`;
+    let imageBytes = bytes;
+    if (!isPng) {
+      const binary = atob(new TextDecoder().decode(bytes).trim());
+      imageBytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    }
+    const imageUrl = URL.createObjectURL(new Blob([imageBytes], { type: 'image/png' }));
     document.documentElement.style.setProperty('--scene-image', `url("${imageUrl}")`);
   } catch {
     document.documentElement.style.setProperty('--scene-image', 'linear-gradient(135deg,#eadffc,#fff1e8)');
